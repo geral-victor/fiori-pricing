@@ -31,20 +31,26 @@
                         </OverflowToolbar>
                     </headerToolbar>
                     <columns>
-                        <Column id="supplierColumn" width="12em">
+                        <Column id="supplierColumn" width="10em">
                             <Text id="supplierHeader" text="Supplier"/>
                         </Column>
-                        <Column id="skuColumn" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="skuColumn" width="10em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="skuHeader" text="SKU"/>
                         </Column>
-                        <Column id="manufacturerColumn" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="manufacturerColumn" width="10em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="manufacturerHeader" text="Manufacturer"/>
                         </Column>
-                        <Column id="mpnColumn" minScreenWidth="Desktop" demandPopin="true">
+                        <Column id="mpnColumn" width="12em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="mpnHeader" text="MPN"/>
                         </Column>
                         <Column id="descriptionColumn" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="descriptionHeader" text="Description"/>
+                        </Column>
+                        <Column id="stockColumn" width="8em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                            <Text id="stockHeader" text="Stock"/>
+                        </Column>
+                        <Column id="pricingColumn" minScreenWidth="Desktop" demandPopin="true">
+                            <Text id="pricingHeader" text="Pricing Tiers"/>
                         </Column>
                     </columns>
                     <items>
@@ -55,6 +61,50 @@
                                 <Text id="manufacturerText" text="{componentData>manufacturer}"/>
                                 <Text id="mpnText" text="{componentData>mpn}"/>
                                 <Text id="descriptionText" text="{componentData>description}"/>
+                                <VBox id="stockBox">
+                                    <BusyIndicator id="stockBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <Text id="stockText" 
+                                        text="{componentData>pricing/current/availability/0/quantity}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
+                                    <Text id="stockError" 
+                                        text="Error"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !!${componentData>pricingError}}"
+                                        class="sapUiTinyMarginTop"/>
+                                </VBox>
+                                <VBox id="pricingBox">
+                                    <BusyIndicator id="pricingBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <List id="tiersList"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"
+                                        showNoData="false"
+                                        class="sapUiTinyMarginTop"
+                                        items="{
+                                            path: 'componentData>pricing/current/pricing',
+                                            templateShareable: false
+                                        }">
+                                        <items>
+                                            <CustomListItem id="tierItem" class="sapUiSmallMarginBottom">
+                                                <HBox id="tierBox" alignItems="Center" class="sapUiTinyPadding">
+                                                    <Text id="tierQty" text="{componentData>minQuantity}+" class="sapUiSmallMarginEnd" width="2.5rem"/>
+                                                    <Text id="tierPrice" text="{
+                                                        parts: [
+                                                            {path: 'componentData>price'},
+                                                            {path: 'componentData>currency'}
+                                                        ],
+                                                        formatter: '.formatPrice'
+                                                    }" renderWhitespace="true"/>
+                                                </HBox>
+                                            </CustomListItem>
+                                        </items>
+                                    </List>
+                                    <Text id="pricingErrorText" 
+                                        text="{componentData>pricingError}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !!${componentData>pricingError}}"
+                                        class="sapUiTinyMarginTop"/>
+                                </VBox>
                             </cells>
                         </ColumnListItem>
                     </items>
