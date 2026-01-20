@@ -3,205 +3,63 @@
     xmlns="sap.m">
     <Page id="page" title="{i18n>title}">
         <content>
-            <Table id="supplierTable" 
-                   items="{
-                       path: '/I_Supplier',
-                       filters: [
-                           {
-                               path: 'SupplierAccountGroup',
-                               operator: 'EQ',
-                               value1: '0001'
-                           }
-                       ]
-                   }"
-                   growing="true"
-                   growingThreshold="5">
-                <headerToolbar>
-                    <OverflowToolbar id="headerToolbar">
-                        <Title id="tableTitle" text="Suppliers" level="H2"/>
-                        <ToolbarSpacer id="toolbarSpacer"/>
-                        <SearchField id="searchField" width="50%" search=".onSearch"/>
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column id="supplierIdColumn" width="12em">
-                        <Text id="supplierIdColumnHeader" text="Supplier ID"/>
-                    </Column>
-                    <Column id="supplierNameColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="supplierNameColumnHeader" text="Supplier Name"/>
-                    </Column>
-                    <Column id="countryColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="countryColumnHeader" text="Country"/>
-                    </Column>
-                    <Column id="cityColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="cityColumnHeader" text="City"/>
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem id="columnListItem" type="Navigation" press=".onSupplierPress">
-                        <cells>
-                            <ObjectIdentifier id="supplierId" title="{Supplier}"/>
-                            <Text id="supplierName" text="{SupplierName}"/>
-                            <Text id="country" text="{Country}"/>
-                            <Text id="city" text="{CityName}"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-            <Table id="infoRecordTable" 
-                   visible="false"
-                   mode="SingleSelectMaster"
-                   selectionChange=".onConditionSelect"
-                   growing="true"
-                   growingThreshold="5">
-                <headerToolbar>
-                    <OverflowToolbar id="infoRecordToolbar">
-                        <Title id="infoRecordTitle" text="Pricing Condition Validity" level="H3"/>
-                        <ToolbarSpacer id="infoRecordSpacer"/>
-                        <Button id="closeButton" text="Close" press=".onCloseInfoRecord"/>
-                        <SearchField id="infoRecordSearchField" width="50%" search=".onInfoRecordSearch"/>
-
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column id="ConditionRecordColumn">
-                        <Text id="conditionRecordColumnHeader2" text="Condition Record"/>
-                    </Column>
-                    <Column id="infoRecordColumn">
-                        <Text id="infoRecordColumnHeader" text="Info Record"/>
-                    </Column>
-                    <Column id="conditionTypeColumn2">
-                        <Text id="conditionTypeColumnHeader2" text="Condition Type"/>
-                    </Column>
-                    <Column id="supplierColumn">
-                        <Text id="supplierColumnHeader" text="Supplier"/>
-                    </Column>
-                    <Column id="materialColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="materialColumnHeader" text="Material"/>
-                    </Column>
-                    <Column id="validityStartColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="validityStartColumnHeader" text="Valid From"/>
-                    </Column>
-                    <Column id="validityEndColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="validityEndColumnHeader" text="Valid To"/>
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem id="infoRecordListItem">
-                        <cells>
-                            <Text id="conditionRecord" text="{infoRecordData>ConditionRecord}"/>
-                            <Text id="infoRecordNumber" text="{infoRecordData>PurchasingInfoRecord}"/>
-                            <Text id="ConditionType" text="{infoRecordData>ConditionType}"/>
-                            <Text id="supplierNumber" text="{infoRecordData>Supplier}"/>
-                            <Text id="materialNumber" text="{infoRecordData>Material}"/>
-                            <Text id="validityStart" text="{infoRecordData>ConditionValidityStartDate}"/>
-                            <Text id="validityEnd" text="{infoRecordData>ConditionValidityEndDate}"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-            <Table id="pricingConditionsTable" 
-                   visible="false"
-                   items="{
-                       path: 'infoRecord>/A_PurInfoRecdPrcgCndn',
-                       sorter: {
-                           path: 'ConditionSequentialNumber',
-                           descending: false
-                       }
-                   }"
-                   growing="true"
-                   growingThreshold="20">
-                <headerToolbar>
-                    <OverflowToolbar id="pricingConditionsToolbar">
-                        <Title id="pricingConditionsTitle" text="Pricing Conditions (A_PurInfoRecdPrcgCndn)" level="H3"/>
-                        <ToolbarSpacer id="pricingConditionsSpacer"/>
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column id="pricingConditionRecordColumn">
-                        <Text id="pricingConditionRecordColumnHeader" text="Condition Record"/>
-                    </Column>
-                    <Column id="conditionSeqNumberColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="conditionSeqNumberColumnHeader" text="Seq. Number"/>
-                    </Column>
-                    <Column id="conditionTypeColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="conditionTypeColumnHeader" text="Condition Type"/>
-                    </Column>
-                    <Column id="conditionRateColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="conditionRateColumnHeader" text="Condition Rate"/>
-                    </Column>
-                    <Column id="conditionQuantityColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="conditionQuantityColumnHeader" text="Condition Quantity"/>
-                    </Column>
-                    <Column id="baseUnitColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="baseUnitColumnHeader" text="Base Unit"/>
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem id="pricingConditionListItem">
-                        <cells>
-                            <Text id="pricingConditionRecordText" text="{infoRecord>ConditionRecord}"/>
-                            <Text id="conditionSeqNumberText" text="{infoRecord>ConditionSequentialNumber}"/>
-                            <Text id="conditionTypeText" text="{infoRecord>ConditionType}"/>
-                            <Text id="conditionRateText" text="{infoRecord>ConditionRateValue} {infoRecord>ConditionRateValueUnit}"/>
-                            <Text id="conditionQuantityText" text="{infoRecord>ConditionQuantity}"/>
-                            <Text id="baseUnitText" text="{infoRecord>ConditionQuantityUnit}"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-            <Table id="scaleTiersTable" 
-                   visible="false"
-                   items="{
-                       path: 'pricingCondition>/A_PurgPrcgCndnRecordScale'
-                   }"
-                   growing="true"
-                   growingThreshold="20">
-                <headerToolbar>
-                    <OverflowToolbar id="scaleTiersToolbar">
-                        <Title id="scaleTiersTitle" text="Condition Scale Tiers (A_PurgPrcgCndnRecordScale)" level="H3"/>
-                        <ToolbarSpacer id="scaleToolbarSpacer"/>
-                        <Button id="checkPriceTiersButton" text="Check current price tiers" press=".onCheckCurrentPriceTiers" type="Emphasized"/>
-                        <Button id="closeScaleButton" text="Close" press=".onCloseScaleTiers"/>
-                    </OverflowToolbar>
-                </headerToolbar>
-                <columns>
-                    <Column id="conditionRecordColumn">
-                        <Text id="conditionRecordColumnHeader" text="Condition Record"/>
-                    </Column>
-                    <Column id="conditionSeqColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="conditionSeqColumnHeader" text="Seq. Number"/>
-                    </Column>
-                    <Column id="scaleLineColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="scaleLineColumnHeader" text="Scale Line"/>
-                    </Column>
-                    <Column id="scaleQuantityColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="scaleQuantityColumnHeader" text="Scale Quantity"/>
-                    </Column>
-                    <Column id="scaleQuantityUnitColumn" minScreenWidth="Tablet" demandPopin="true">
-                        <Text id="scaleQuantityUnitColumnHeader" text="Unit"/>
-                    </Column>
-                    <Column id="conditionRateValueColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="conditionRateValueColumnHeader" text="Condition Rate Value"/>
-                    </Column>
-                    <Column id="conditionCurrencyColumn" minScreenWidth="Desktop" demandPopin="true">
-                        <Text id="conditionCurrencyColumnHeader" text="Currency"/>
-                    </Column>
-                </columns>
-                <items>
-                    <ColumnListItem id="scaleTierListItem">
-                        <cells>
-                            <Text id="conditionRecordText" text="{pricingCondition>ConditionRecord}"/>
-                            <Text id="conditionSeqText" text="{pricingCondition>ConditionSequentialNumber}"/>
-                            <Text id="scaleLineText" text="{pricingCondition>ConditionScaleLine}"/>
-                            <Text id="scaleQuantityText" text="{pricingCondition>ConditionScaleQuantity}"/>
-                            <Text id="scaleQuantityUnitText" text="{pricingCondition>ConditionScaleQuantityUnit}"/>
-                            <Text id="conditionRateValueText" text="{pricingCondition>ConditionRateValue}"/>
-                            <Text id="conditionCurrencyText" text="{pricingCondition>ConditionRateValueUnit}"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
+            <VBox id="mainVBox" class="sapUiSmallMargin">
+                <HBox id="searchHBox" alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Input 
+                        id="componentInput" 
+                        placeholder="Enter component query (e.g., Manufacturer MPN or just MPN)"
+                        width="400px"
+                        submit=".onSearch"
+                        class="sapUiSmallMarginEnd"/>
+                    <Button 
+                        id="searchButton" 
+                        text="Search" 
+                        type="Emphasized"
+                        press=".onSearch"
+                        enabled="{= !${componentData>/loading}}"/>
+                </HBox>
+                
+                <Table 
+                    id="resultsTable" 
+                    items="{componentData>/results}"
+                    visible="{= ${componentData>/results}.length > 0}"
+                    growing="true"
+                    growingThreshold="20">
+                    <headerToolbar>
+                        <OverflowToolbar id="resultsToolbar">
+                            <Title id="resultsTitle" text="Component Search Results" level="H2"/>
+                        </OverflowToolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column id="supplierColumn" width="12em">
+                            <Text id="supplierHeader" text="Supplier"/>
+                        </Column>
+                        <Column id="skuColumn" minScreenWidth="Tablet" demandPopin="true">
+                            <Text id="skuHeader" text="SKU"/>
+                        </Column>
+                        <Column id="manufacturerColumn" minScreenWidth="Tablet" demandPopin="true">
+                            <Text id="manufacturerHeader" text="Manufacturer"/>
+                        </Column>
+                        <Column id="mpnColumn" minScreenWidth="Desktop" demandPopin="true">
+                            <Text id="mpnHeader" text="MPN"/>
+                        </Column>
+                        <Column id="descriptionColumn" minScreenWidth="Desktop" demandPopin="true">
+                            <Text id="descriptionHeader" text="Description"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem id="resultItem">
+                            <cells>
+                                <Text id="supplierText" text="{componentData>supplier}"/>
+                                <Text id="skuText" text="{componentData>sku}"/>
+                                <Text id="manufacturerText" text="{componentData>manufacturer}"/>
+                                <Text id="mpnText" text="{componentData>mpn}"/>
+                                <Text id="descriptionText" text="{componentData>description}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
         </content>
     </Page>
 </mvc:View>
