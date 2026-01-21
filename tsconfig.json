@@ -10,6 +10,7 @@
     "rootDir": "./webapp",
     "outDir": "./dist",
     "baseUrl": "./",
+    "noUncheckedIndexedAccess": true /* Add 'undefined' to a type when accessed using an index. */,
     "paths": {
       "project1/*": ["./webapp/*"],
       "unit/*": ["./webapp/test/unit/*"],

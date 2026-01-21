@@ -13,9 +13,13 @@ import type {
   PricingSnapshot,
 } from '@GERAL-STT/component-pricing-api';
 
-// interface PriceTierWithApplicable extends PricingTier {
-//   isApplicable: boolean;
-// }
+interface PriceTierWithApplicable extends PricingTier {
+  isApplicable: boolean;
+}
+
+type PricingSnapshotWithApplicableTiers = PricingSnapshot & {
+  pricing: PriceTierWithApplicable[];
+};
 
 interface ResultItem {
   supplier: string;
@@ -24,7 +28,7 @@ interface ResultItem {
   mpn: string;
   description: string;
   pricingLoading: boolean;
-  pricing: PricingSnapshot | null;
+  pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;
   highlight: string;
 }
@@ -88,11 +92,12 @@ export default class View1 extends Controller {
 
       if (data.skuList.length > 0) {
         // Initialize results with SKU data and loading state for pricing
-        const results = data.skuList.map((sku) => ({
+        const results: ResultItem[] = data.skuList.map((sku) => ({
           ...sku,
           pricingLoading: true,
           pricing: null,
           pricingError: null,
+          highlight: 'false',
         }));
         oModel.setProperty('/results', results);
 
@@ -155,10 +160,21 @@ export default class View1 extends Controller {
         (await response.json()) as unknown as GetPricingAndStockBySkuResponse;
 
       // Update the specific item with pricing data (take first item from array)
-      const pricingInfo = pricingData.PricingAndStockList[0];
-      oModel.setProperty(`/results/${String(index)}/pricing`, pricingInfo.current);
+      const currentPricingSnapshot =
+        pricingData.PricingAndStockList[0]?.current;
+      if (currentPricingSnapshot === undefined) {
+        throw new Error('No pricing data available');
+      }
+
+      oModel.setProperty(`/results/${String(index)}/pricing`, {
+        ...currentPricingSnapshot,
+        pricing: currentPricingSnapshot.pricing.map((tier) => ({
+          ...tier,
+          isApplicable: false,
+        })),
+      });
       oModel.setProperty(`/results/${String(index)}/pricingLoading`, false);
-      
+
       // Recalculate highlights if a required quantity is set
       this.onQuantityChange();
     } catch (error: unknown) {
@@ -191,7 +207,10 @@ export default class View1 extends Controller {
     this.highlightBestPrices(results, requiredQuantity, bestUnitPrice, oModel);
   }
 
-  private getRequiredQuantity(oEvent: Event | undefined, oModel: JSONModel): number {
+  private getRequiredQuantity(
+    oEvent: Event | undefined,
+    oModel: JSONModel,
+  ): number {
     if (oEvent) {
       const oInput = oEvent.getSource<Input>();
       const sValue = oInput.getValue();
@@ -216,10 +235,16 @@ export default class View1 extends Controller {
     });
   }
 
-  private findBestUnitPrice(results: ResultItem[], requiredQuantity: number): number {
+  private findBestUnitPrice(
+    results: ResultItem[],
+    requiredQuantity: number,
+  ): number {
     return results.reduce((best, result) => {
       if (this.hasValidPricing(result) && result.pricing?.pricing) {
-        const unitPrice = this.calculateUnitPrice(result.pricing.pricing, requiredQuantity);
+        const unitPrice = this.calculateUnitPrice(
+          result.pricing.pricing,
+          requiredQuantity,
+        );
         return Math.min(best, unitPrice);
       }
       return best;
@@ -230,34 +255,56 @@ export default class View1 extends Controller {
     results: ResultItem[],
     requiredQuantity: number,
     bestUnitPrice: number,
-    oModel: JSONModel
+    oModel: JSONModel,
   ): void {
     results.forEach((result, index) => {
-      const highlight = this.shouldHighlight(result, requiredQuantity, bestUnitPrice) ? 'true' : 'false';
+      const highlight = this.shouldHighlight(
+        result,
+        requiredQuantity,
+        bestUnitPrice,
+      )
+        ? 'true'
+        : 'false';
       oModel.setProperty(`/results/${String(index)}/highlight`, highlight);
     });
   }
 
   private hasValidPricing(result: ResultItem): boolean {
-    return !result.pricingLoading && !result.pricingError && !!result.pricing?.pricing;
+    return (
+      !result.pricingLoading &&
+      !result.pricingError &&
+      !!result.pricing?.pricing
+    );
   }
 
-  private shouldHighlight(result: ResultItem, requiredQuantity: number, bestUnitPrice: number): boolean {
+  private shouldHighlight(
+    result: ResultItem,
+    requiredQuantity: number,
+    bestUnitPrice: number,
+  ): boolean {
     if (!this.hasValidPricing(result) || !result.pricing?.pricing) {
       return false;
     }
 
-    const unitPrice = this.calculateUnitPrice(result.pricing.pricing, requiredQuantity);
+    const unitPrice = this.calculateUnitPrice(
+      result.pricing.pricing,
+      requiredQuantity,
+    );
     return Math.abs(unitPrice - bestUnitPrice) < 0.001;
   }
 
-  private calculateUnitPrice(pricingTiers: PricingTier[], quantity: number): number {
+  private calculateUnitPrice(
+    pricingTiers: PricingTier[],
+    quantity: number,
+  ): number {
     if (!pricingTiers.length) {
       return Infinity;
     }
 
     // Sort pricing tiers by minQuantity in ascending order
-    const sortedTiers = [...pricingTiers].sort((a, b) => a.minQuantity - b.minQuantity);
+    const sortedTiers = [...pricingTiers].sort(
+      (a, b) => a.minQuantity - b.minQuantity,
+    );
 
     // Find the applicable tier (highest minQuantity that is <= required quantity)
     let applicableTier = null;
