@@ -49,6 +49,12 @@
                         <Column id="stockColumn" width="8em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="stockHeader" text="Stock"/>
                         </Column>
+                        <Column id="moqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                            <Text id="moqHeader" text="MOQ"/>
+                        </Column>
+                        <Column id="mpqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                            <Text id="mpqHeader" text="MPQ"/>
+                        </Column>
                         <Column id="pricingColumn" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="pricingHeader" text="Pricing Tiers"/>
                         </Column>
@@ -72,6 +78,22 @@
                                         text="Error"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !!${componentData>pricingError}}"
                                         class="sapUiTinyMarginTop"/>
+                                </VBox>
+                                <VBox id="moqBox">
+                                    <BusyIndicator id="moqBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <Text id="moqText" 
+                                        text="{componentData>pricing/current/moq}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
+                                </VBox>
+                                <VBox id="mpqBox">
+                                    <BusyIndicator id="mpqBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <Text id="mpqText" 
+                                        text="{componentData>pricing/current/mpq}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
                                 <VBox id="pricingBox">
                                     <BusyIndicator id="pricingBusy" 
