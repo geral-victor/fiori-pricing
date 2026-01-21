@@ -26,3 +26,8 @@ tr[data-highlight="true"]:hover .sapMListTblSubRow,
 tr[data-highlight="true"]:hover .sapMCustomListItem {
     background-color: #c8e6c9 !important;
 }
+
+/* Make applicable price tier bold */
+li[data-applicable="true"] .sapMText {
+    font-weight: bold !important;
+}

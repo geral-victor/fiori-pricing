@@ -202,11 +202,13 @@ export default class View1 extends Controller {
 
     if (!this.isValidQuantity(requiredQuantity) || !results.length) {
       this.clearAllHighlights(results, oModel);
+      this.clearAllApplicableTiers(results, oModel);
       return;
     }
 
     const bestUnitPrice = this.findBestUnitPrice(results, requiredQuantity);
     this.highlightBestPrices(results, requiredQuantity, bestUnitPrice, oModel);
+    this.updateApplicableTiers(results, requiredQuantity, oModel);
   }
 
   private getRequiredQuantity(
@@ -234,6 +236,53 @@ export default class View1 extends Controller {
   private clearAllHighlights(results: ResultItem[], oModel: JSONModel): void {
     results.forEach((_result, index) => {
       oModel.setProperty(`/results/${String(index)}/highlight`, 'false');
+    });
+  }
+
+  private clearAllApplicableTiers(results: ResultItem[], oModel: JSONModel): void {
+    results.forEach((result, resultIndex) => {
+      if (result.pricing?.pricing) {
+        result.pricing.pricing.forEach((_tier, tierIndex) => {
+          oModel.setProperty(
+            `/results/${String(resultIndex)}/pricing/pricing/${String(tierIndex)}/isApplicable`,
+            'false'
+          );
+        });
+      }
+    });
+  }
+
+  private updateApplicableTiers(
+    results: ResultItem[],
+    requiredQuantity: number,
+    oModel: JSONModel,
+  ): void {
+    results.forEach((result, resultIndex) => {
+      if (!this.hasValidPricing(result) || !result.pricing?.pricing) {
+        return;
+      }
+
+      const pricingTiers = result.pricing.pricing;
+      const sortedTiers = [...pricingTiers].sort(
+        (a, b) => a.minQuantity - b.minQuantity,
+      );
+
+      // Find the applicable tier (last tier where requiredQuantity >= minQuantity)
+      const applicableTierIndex = sortedTiers.reduce(
+        (lastIndex, tier, index) => 
+          requiredQuantity >= tier.minQuantity ? index : lastIndex,
+        -1
+      );
+
+      // Update isApplicable for all tiers
+      pricingTiers.forEach((tier, tierIndex) => {
+        const isApplicable = applicableTierIndex >= 0 && 
+          tier === sortedTiers[applicableTierIndex] ? 'true' : 'false';
+        oModel.setProperty(
+          `/results/${String(resultIndex)}/pricing/pricing/${String(tierIndex)}/isApplicable`,
+          isApplicable
+        );
+      });
     });
   }
 
