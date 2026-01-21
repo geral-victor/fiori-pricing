@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome with start-local",
+      "url": "http://localhost:8080/test/flp.html#app-preview",
+      "webRoot": "${workspaceFolder}/webapp",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: start-local",
+      "timeout": 30000
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/webapp",
+      "sourceMaps": true
+    },
+    {
+      "type": "msedge",
+      "request": "launch",
+      "name": "Launch Edge with start-local",
+      "url": "http://localhost:8080/test/flp.html#app-preview",
+      "webRoot": "${workspaceFolder}/webapp",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: start-local",
+      "timeout": 30000
+    },
+    {
+      "type": "msedge",
+      "request": "attach",
+      "name": "Attach to Edge",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/webapp",
+      "sourceMaps": true
+    }
+  ]
+}

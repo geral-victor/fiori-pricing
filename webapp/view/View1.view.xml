@@ -1,5 +1,6 @@
 <mvc:View controllerName="project1.controller.View1"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
     xmlns="sap.m">
     <Page id="page" title="{i18n>title}">
         <content>
@@ -28,6 +29,15 @@
                     <headerToolbar>
                         <OverflowToolbar id="resultsToolbar">
                             <Title id="resultsTitle" text="Component Search Results" level="H2"/>
+                            <ToolbarSpacer id="toolbarSpacer"/>
+                            <Label id="quantityLabel" text="Required Quantity:" class="sapUiSmallMarginEnd"/>
+                            <Input 
+                                id="requiredQuantityInput" 
+                                placeholder="Enter quantity"
+                                width="150px"
+                                type="Number"
+                                value="{componentData>/requiredQuantity}"
+                                liveChange=".onQuantityChange"/>
                         </OverflowToolbar>
                     </headerToolbar>
                     <columns>
@@ -61,6 +71,9 @@
                     </columns>
                     <items>
                         <ColumnListItem id="resultItem">
+                            <customData>
+                                <core:CustomData key="highlight" value="{componentData>highlight}" writeToDom="true" />
+                            </customData>
                             <cells>
                                 <Text id="supplierText" text="{componentData>supplier}"/>
                                 <Text id="skuText" text="{componentData>sku}"/>

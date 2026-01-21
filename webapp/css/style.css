@@ -1,1 +1,9 @@
-/* Enter your custom styles here */
+/* Light green background for best price rows */
+tr[data-highlight="true"] {
+    background-color: #e8f5e9 !important;
+}
+
+/* Hover state */
+tr[data-highlight="true"]:hover {
+    background-color: #c8e6c9 !important;
+}
