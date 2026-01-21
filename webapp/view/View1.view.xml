@@ -126,7 +126,7 @@
                                                     <core:CustomData key="applicable" value="{componentData>isApplicable}" writeToDom="true" />
                                                 </customData>
                                                 <HBox id="tierBox" alignItems="Center" class="sapUiTinyPadding">
-                                                    <Text id="tierQty" text="{componentData>minQuantity}+" class="sapUiSmallMarginEnd" width="2.5rem"/>
+                                                    <Text id="tierQty" text="{componentData>minQuantity}+" class="sapUiSmallMarginEnd" width="3rem"/>
                                                     <Text id="tierPrice" text="{
                                                         parts: [
                                                             {path: 'componentData>price'},

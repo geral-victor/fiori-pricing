@@ -1,5 +1,5 @@
 import Controller from 'sap/ui/core/mvc/Controller';
-import JSONModel from 'sap/ui/model/json/JSONModel';
+import TypedJSONModel from 'sap/ui/model/json/TypedJSONModel';
 import MessageToast from 'sap/m/MessageToast';
 import MessageBox from 'sap/m/MessageBox';
 import Input from 'sap/m/Input';
@@ -33,17 +33,25 @@ interface ResultItem {
   highlight: string; // 'true' | 'false'
 }
 
+interface ComponentData {
+  results: ResultItem[];
+  loading: boolean;
+  requiredQuantity: number | null;
+}
+
 /**
  * @namespace project1.controller
  */
 export default class View1 extends Controller {
+  private componentModel!: TypedJSONModel<ComponentData>;
+
   public onInit(): void {
-    const oModel = new JSONModel({
+    this.componentModel = new TypedJSONModel<ComponentData>({
       results: [],
       loading: false,
       requiredQuantity: null,
     });
-    this.getView()?.setModel(oModel, 'componentData');
+    this.getView()?.setModel(this.componentModel, 'componentData');
   }
 
   public async onSearch(): Promise<void> {
@@ -55,9 +63,8 @@ export default class View1 extends Controller {
       return;
     }
 
-    const oModel = this.getView()?.getModel('componentData') as JSONModel;
-    oModel.setProperty('/loading', true);
-    oModel.setProperty('/results', []);
+    this.componentModel.setProperty('/loading', true);
+    this.componentModel.setProperty('/results', []);
 
     try {
       const requestBody: GetSkuByManufacturerAndMpnRequestBody = {
@@ -90,6 +97,12 @@ export default class View1 extends Controller {
       const data =
         (await response.json()) as unknown as GetSkuByManufacturerAndMpnResponseBody;
 
+      if (data.warnings && data.warnings.length > 0) {
+        MessageBox.warning(
+          `Warnings during search:\n- ${data.warnings.join('\n- ')}`,
+        );
+      }
+
       if (data.skuList.length > 0) {
         // Initialize results with SKU data and loading state for pricing
         const results: ResultItem[] = data.skuList.map((sku) => ({
@@ -99,7 +112,7 @@ export default class View1 extends Controller {
           pricingError: null,
           highlight: 'false',
         }));
-        oModel.setProperty('/results', results);
+        this.componentModel.setProperty('/results', results);
 
         MessageToast.show(
           `Found ${String(data.skuList.length)} component(s) in ${(fetchingTime / 1000).toFixed(2)}s. Fetching pricing...`,
@@ -107,7 +120,7 @@ export default class View1 extends Controller {
 
         // Fetch pricing for all SKUs in parallel
         data.skuList.forEach((sku, index) => {
-          this.fetchPricingForSku(sku.sku, sku.supplier, index, oModel).catch(
+          this.fetchPricingForSku(sku.sku, sku.supplier, index).catch(
             (error: unknown) => {
               console.error(
                 `Failed to fetch pricing for SKU ${sku.sku}:`,
@@ -125,7 +138,7 @@ export default class View1 extends Controller {
       MessageBox.error(`Failed to search components:\n${errorMessage}`);
       console.error('Error searching components:', error);
     } finally {
-      oModel.setProperty('/loading', false);
+      this.componentModel.setProperty('/loading', false);
     }
   }
 
@@ -133,7 +146,6 @@ export default class View1 extends Controller {
     sku: string,
     supplier: string,
     index: number,
-    oModel: JSONModel,
   ): Promise<void> {
     try {
       const requestBody: GetPricingAndStockBySkuRequestBody = {
@@ -174,19 +186,20 @@ export default class View1 extends Controller {
         })),
       };
 
-      oModel.setProperty(`/results/${String(index)}/pricing`, pricing);
-      oModel.setProperty(`/results/${String(index)}/pricingLoading`, false);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/pricing`, pricing);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/pricingLoading`, false);
 
       // Recalculate highlights if a required quantity is set
       this.onQuantityChange();
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      oModel.setProperty(
-        `/results/${String(index)}/pricingError`,
-        errorMessage,
-      );
-      oModel.setProperty(`/results/${String(index)}/pricingLoading`, false);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/pricingError`, errorMessage);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/pricingLoading`, false);
     }
   }
 
@@ -196,58 +209,58 @@ export default class View1 extends Controller {
   }
 
   public onQuantityChange(oEvent?: Event): void {
-    const oModel = this.getView()?.getModel('componentData') as JSONModel;
-    const requiredQuantity = this.getRequiredQuantity(oEvent, oModel);
-    const results = this.getResults(oModel);
+    const requiredQuantity = this.getRequiredQuantity(oEvent);
+    const results = this.getResults();
 
     if (!this.isValidQuantity(requiredQuantity) || !results.length) {
-      this.clearAllHighlights(results, oModel);
-      this.clearAllApplicableTiers(results, oModel);
+      this.clearAllHighlights(results);
+      this.clearAllApplicableTiers(results);
       return;
     }
 
     const bestUnitPrice = this.findBestUnitPrice(results, requiredQuantity);
-    this.highlightBestPrices(results, requiredQuantity, bestUnitPrice, oModel);
-    this.updateApplicableTiers(results, requiredQuantity, oModel);
+    this.highlightBestPrices(results, requiredQuantity, bestUnitPrice);
+    this.updateApplicableTiers(results, requiredQuantity);
   }
 
-  private getRequiredQuantity(
-    oEvent: Event | undefined,
-    oModel: JSONModel,
-  ): number {
+  private getRequiredQuantity(oEvent?: Event): number {
     if (oEvent) {
       const oInput = oEvent.getSource<Input>();
       const sValue = oInput.getValue();
       const quantity = sValue ? parseFloat(sValue) : 0;
-      oModel.setProperty('/requiredQuantity', quantity);
+      this.componentModel.setProperty('/requiredQuantity', quantity);
       return quantity;
     }
-    return oModel.getProperty('/requiredQuantity') as number;
+    return this.componentModel.getProperty('/requiredQuantity') ?? 0;
   }
 
-  private getResults(oModel: JSONModel): ResultItem[] {
-    return oModel.getProperty('/results') as ResultItem[];
+  private getResults(): ResultItem[] {
+    return this.componentModel.getProperty('/results');
   }
 
   private isValidQuantity(quantity: number): boolean {
     return !!(quantity && quantity > 0);
   }
 
-  private clearAllHighlights(results: ResultItem[], oModel: JSONModel): void {
+  private clearAllHighlights(results: ResultItem[]): void {
     results.forEach((_result, index) => {
-      oModel.setProperty(`/results/${String(index)}/highlight`, 'false');
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/highlight`, 'false');
     });
   }
 
-  private clearAllApplicableTiers(results: ResultItem[], oModel: JSONModel): void {
+  private clearAllApplicableTiers(results: ResultItem[]): void {
     results.forEach((result, resultIndex) => {
       if (result.pricing?.pricing) {
-        result.pricing.pricing.forEach((_tier, tierIndex) => {
-          oModel.setProperty(
-            `/results/${String(resultIndex)}/pricing/pricing/${String(tierIndex)}/isApplicable`,
-            'false'
-          );
-        });
+        const updatedPricing: PricingSnapshotWithApplicableTiers = {
+          ...result.pricing,
+          pricing: result.pricing.pricing.map(tier => ({
+            ...tier,
+            isApplicable: 'false'
+          }))
+        };
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        this.componentModel.setProperty(`/results/${resultIndex}/pricing`, updatedPricing);
       }
     });
   }
@@ -255,7 +268,6 @@ export default class View1 extends Controller {
   private updateApplicableTiers(
     results: ResultItem[],
     requiredQuantity: number,
-    oModel: JSONModel,
   ): void {
     results.forEach((result, resultIndex) => {
       if (!this.hasValidPricing(result) || !result.pricing?.pricing) {
@@ -275,14 +287,17 @@ export default class View1 extends Controller {
       );
 
       // Update isApplicable for all tiers
-      pricingTiers.forEach((tier, tierIndex) => {
-        const isApplicable = applicableTierIndex >= 0 && 
-          tier === sortedTiers[applicableTierIndex] ? 'true' : 'false';
-        oModel.setProperty(
-          `/results/${String(resultIndex)}/pricing/pricing/${String(tierIndex)}/isApplicable`,
-          isApplicable
-        );
-      });
+      const updatedPricing: PricingSnapshotWithApplicableTiers = {
+        ...result.pricing,
+        pricing: pricingTiers.map(tier => ({
+          ...tier,
+          isApplicable: applicableTierIndex >= 0 && 
+            tier === sortedTiers[applicableTierIndex] ? 'true' : 'false'
+        }))
+      };
+      
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${resultIndex}/pricing`, updatedPricing);
     });
   }
 
@@ -306,7 +321,6 @@ export default class View1 extends Controller {
     results: ResultItem[],
     requiredQuantity: number,
     bestUnitPrice: number,
-    oModel: JSONModel,
   ): void {
     results.forEach((result, index) => {
       const highlight = this.shouldHighlight(
@@ -316,7 +330,8 @@ export default class View1 extends Controller {
       )
         ? 'true'
         : 'false';
-      oModel.setProperty(`/results/${String(index)}/highlight`, highlight);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      this.componentModel.setProperty(`/results/${index}/highlight`, highlight);
     });
   }
 
