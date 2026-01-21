@@ -14,7 +14,7 @@ import type {
 } from '@GERAL-STT/component-pricing-api';
 
 interface PriceTierWithApplicable extends PricingTier {
-  isApplicable: boolean;
+  isApplicable: string; // 'true' | 'false'
 }
 
 type PricingSnapshotWithApplicableTiers = PricingSnapshot & {
@@ -30,7 +30,7 @@ interface ResultItem {
   pricingLoading: boolean;
   pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;
-  highlight: string;
+  highlight: string; // 'true' | 'false'
 }
 
 /**
@@ -166,13 +166,15 @@ export default class View1 extends Controller {
         throw new Error('No pricing data available');
       }
 
-      oModel.setProperty(`/results/${String(index)}/pricing`, {
+      const pricing: PricingSnapshotWithApplicableTiers = {
         ...currentPricingSnapshot,
         pricing: currentPricingSnapshot.pricing.map((tier) => ({
           ...tier,
-          isApplicable: false,
+          isApplicable: 'false',
         })),
-      });
+      };
+
+      oModel.setProperty(`/results/${String(index)}/pricing`, pricing);
       oModel.setProperty(`/results/${String(index)}/pricingLoading`, false);
 
       // Recalculate highlights if a required quantity is set
