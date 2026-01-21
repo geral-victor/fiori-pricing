@@ -85,7 +85,7 @@
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="stockText" 
-                                        text="{componentData>pricing/current/availability/0/quantity}"
+                                        text="{componentData>pricing/availability/0/quantity}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                     <Text id="stockError" 
                                         text="Error"
@@ -97,7 +97,7 @@
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="moqText" 
-                                        text="{componentData>pricing/current/moq}"
+                                        text="{componentData>pricing/moq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
                                 <VBox id="mpqBox">
@@ -105,7 +105,7 @@
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="mpqText" 
-                                        text="{componentData>pricing/current/mpq}"
+                                        text="{componentData>pricing/mpq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
                                 <VBox id="pricingBox">
@@ -117,7 +117,7 @@
                                         showNoData="false"
                                         class="sapUiTinyMarginTop"
                                         items="{
-                                            path: 'componentData>pricing/current/pricing',
+                                            path: 'componentData>pricing/pricing',
                                             templateShareable: false
                                         }">
                                         <items>

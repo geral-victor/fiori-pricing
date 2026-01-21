@@ -10,8 +10,12 @@ import type {
   GetPricingAndStockBySkuRequestBody,
   GetPricingAndStockBySkuResponse,
   PricingTier,
-  PricingAndStockInfo,
+  PricingSnapshot,
 } from '@GERAL-STT/component-pricing-api';
+
+// interface PriceTierWithApplicable extends PricingTier {
+//   isApplicable: boolean;
+// }
 
 interface ResultItem {
   supplier: string;
@@ -20,7 +24,7 @@ interface ResultItem {
   mpn: string;
   description: string;
   pricingLoading: boolean;
-  pricing: PricingAndStockInfo | null;
+  pricing: PricingSnapshot | null;
   pricingError: string | null;
   highlight: string;
 }
@@ -152,7 +156,7 @@ export default class View1 extends Controller {
 
       // Update the specific item with pricing data (take first item from array)
       const pricingInfo = pricingData.PricingAndStockList[0];
-      oModel.setProperty(`/results/${String(index)}/pricing`, pricingInfo);
+      oModel.setProperty(`/results/${String(index)}/pricing`, pricingInfo.current);
       oModel.setProperty(`/results/${String(index)}/pricingLoading`, false);
       
       // Recalculate highlights if a required quantity is set
@@ -214,8 +218,8 @@ export default class View1 extends Controller {
 
   private findBestUnitPrice(results: ResultItem[], requiredQuantity: number): number {
     return results.reduce((best, result) => {
-      if (this.hasValidPricing(result) && result.pricing?.current.pricing) {
-        const unitPrice = this.calculateUnitPrice(result.pricing.current.pricing, requiredQuantity);
+      if (this.hasValidPricing(result) && result.pricing?.pricing) {
+        const unitPrice = this.calculateUnitPrice(result.pricing.pricing, requiredQuantity);
         return Math.min(best, unitPrice);
       }
       return best;
@@ -235,15 +239,15 @@ export default class View1 extends Controller {
   }
 
   private hasValidPricing(result: ResultItem): boolean {
-    return !result.pricingLoading && !result.pricingError && !!result.pricing?.current.pricing;
+    return !result.pricingLoading && !result.pricingError && !!result.pricing?.pricing;
   }
 
   private shouldHighlight(result: ResultItem, requiredQuantity: number, bestUnitPrice: number): boolean {
-    if (!this.hasValidPricing(result) || !result.pricing?.current.pricing) {
+    if (!this.hasValidPricing(result) || !result.pricing?.pricing) {
       return false;
     }
 
-    const unitPrice = this.calculateUnitPrice(result.pricing.current.pricing, requiredQuantity);
+    const unitPrice = this.calculateUnitPrice(result.pricing.pricing, requiredQuantity);
     return Math.abs(unitPrice - bestUnitPrice) < 0.001;
   }
 
