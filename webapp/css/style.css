@@ -3,7 +3,26 @@ tr[data-highlight="true"] {
     background-color: #e8f5e9 !important;
 }
 
+/* Apply green background to all nested elements in highlighted rows */
+tr[data-highlight="true"] .sapMListTblCell,
+tr[data-highlight="true"] .sapMCLI,
+tr[data-highlight="true"] .sapMListTblSubRow {
+    background-color: #e8f5e9 !important;
+}
+
+/* Apply green background to pricing tier items */
+tr[data-highlight="true"] .sapMCustomListItem {
+    background-color: #e8f5e9 !important;
+}
+
 /* Hover state */
 tr[data-highlight="true"]:hover {
+    background-color: #c8e6c9 !important;
+}
+
+tr[data-highlight="true"]:hover .sapMListTblCell,
+tr[data-highlight="true"]:hover .sapMCLI,
+tr[data-highlight="true"]:hover .sapMListTblSubRow,
+tr[data-highlight="true"]:hover .sapMCustomListItem {
     background-color: #c8e6c9 !important;
 }
