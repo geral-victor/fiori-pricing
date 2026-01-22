@@ -421,7 +421,7 @@ export default class View1 extends Controller {
       result.pricing.pricing,
       requiredQuantity,
     );
-    return Math.abs(unitPrice - bestUnitPrice) < 0.001;
+    return Math.abs(unitPrice - bestUnitPrice) < 0.0001;
   }
 
   private calculateUnitPrice(

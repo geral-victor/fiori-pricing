@@ -60,7 +60,7 @@
                             <Text id="descriptionHeader" text="Description"/>
                         </Column>
                         <Column id="packagingColumn" width="5em" minScreenWidth="Tablet" demandPopin="true">
-                            <Text id="packagingHeader" text="Packaging"/>
+                            <Text id="packagingHeader" text="Package"/>
                         </Column>
                         <Column id="stockColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="stockHeader" text="Stock"/>
