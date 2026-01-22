@@ -27,8 +27,6 @@ interface ResultItem {
   manufacturer: string;
   mpn: string;
   description: string;
-  url?: string;
-  imageUrl?: string;
   pricingLoading: boolean;
   pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;

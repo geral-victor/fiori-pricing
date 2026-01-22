@@ -41,6 +41,9 @@
                         </OverflowToolbar>
                     </headerToolbar>
                     <columns>
+                        <Column id="imageColumn" width="5em" minScreenWidth="Desktop" demandPopin="true">
+                            <Text id="imageHeader" text="Image"/>
+                        </Column>
                         <Column id="supplierColumn" width="10em">
                             <Text id="supplierHeader" text="Supplier"/>
                         </Column>
@@ -62,9 +65,9 @@
                         <Column id="moqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="moqHeader" text="MOQ"/>
                         </Column>
-                        <Column id="mpqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <!-- <Column id="mpqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="mpqHeader" text="MPQ"/>
-                        </Column>
+                        </Column> -->
                         <Column id="pricingColumn" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="pricingHeader" text="Pricing Tiers"/>
                         </Column>
@@ -75,8 +78,17 @@
                                 <core:CustomData key="highlight" value="{componentData>highlight}" writeToDom="true" />
                             </customData>
                             <cells>
+                                <Image id="productImage" 
+                                    src="{componentData>imageUrl}" 
+                                    width="3rem"
+                                    densityAware="false"
+                                    visible="{= !!${componentData>imageUrl}}"/>
                                 <Text id="supplierText" text="{componentData>supplier}"/>
-                                <Text id="skuText" text="{componentData>sku}"/>
+                                <Link id="skuLink" 
+                                    text="{componentData>sku}" 
+                                    href="{componentData>url}"
+                                    target="_blank"
+                                    enabled="{= !!${componentData>url}}"/>
                                 <Text id="manufacturerText" text="{componentData>manufacturer}"/>
                                 <Text id="mpnText" text="{componentData>mpn}"/>
                                 <Text id="descriptionText" text="{componentData>description}"/>
@@ -100,14 +112,14 @@
                                         text="{componentData>pricing/moq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
-                                <VBox id="mpqBox">
+                                <!-- <VBox id="mpqBox">
                                     <BusyIndicator id="mpqBusy" 
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="mpqText" 
                                         text="{componentData>pricing/mpq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
-                                </VBox>
+                                </VBox> -->
                                 <VBox id="pricingBox">
                                     <BusyIndicator id="pricingBusy" 
                                         size="1rem" 
