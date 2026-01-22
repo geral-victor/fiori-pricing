@@ -44,31 +44,34 @@
                         <Column id="imageColumn" width="5em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="imageHeader" text="Image"/>
                         </Column>
-                        <Column id="supplierColumn" width="10em">
+                        <Column id="supplierColumn" width="6em">
                             <Text id="supplierHeader" text="Supplier"/>
                         </Column>
-                        <Column id="skuColumn" width="10em" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="skuColumn" width="8em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="skuHeader" text="SKU"/>
                         </Column>
-                        <Column id="manufacturerColumn" width="10em" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="manufacturerColumn" width="8em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="manufacturerHeader" text="Manufacturer"/>
                         </Column>
-                        <Column id="mpnColumn" width="12em" minScreenWidth="Desktop" demandPopin="true">
+                        <Column id="mpnColumn" width="10em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="mpnHeader" text="MPN"/>
                         </Column>
-                        <Column id="descriptionColumn" minScreenWidth="Desktop" demandPopin="true">
+                        <Column id="descriptionColumn" width="10em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="descriptionHeader" text="Description"/>
                         </Column>
-                        <Column id="stockColumn" width="8em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <Column id="packagingColumn" width="6em" minScreenWidth="Tablet" demandPopin="true">
+                            <Text id="packagingHeader" text="Packaging"/>
+                        </Column>
+                        <Column id="stockColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="stockHeader" text="Stock"/>
                         </Column>
-                        <Column id="moqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <Column id="moqColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="moqHeader" text="MOQ"/>
                         </Column>
-                        <!-- <Column id="mpqColumn" width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <Column id="mpqColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="mpqHeader" text="MPQ"/>
-                        </Column> -->
-                        <Column id="pricingColumn" minScreenWidth="Desktop" demandPopin="true">
+                        </Column>
+                        <Column id="pricingColumn" width="12em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="pricingHeader" text="Pricing Tiers"/>
                         </Column>
                     </columns>
@@ -98,6 +101,14 @@
                                     formatter: '.formatMpnWithHighlight'
                                 }"/>
                                 <Text id="descriptionText" text="{componentData>description}"/>
+                                <VBox id="packagingBox">
+                                    <BusyIndicator id="packagingBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <Text id="packagingText" 
+                                        text="{componentData>packaging}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
+                                </VBox>
                                 <VBox id="stockBox">
                                     <BusyIndicator id="stockBusy" 
                                         size="1rem" 
@@ -115,17 +126,17 @@
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="moqText" 
-                                        text="{componentData>pricing/moq}"
+                                        text="{componentData>moq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
-                                <!-- <VBox id="mpqBox">
+                                <VBox id="mpqBox">
                                     <BusyIndicator id="mpqBusy" 
                                         size="1rem" 
                                         visible="{componentData>pricingLoading}"/>
                                     <Text id="mpqText" 
-                                        text="{componentData>pricing/mpq}"
+                                        text="{componentData>mpq}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
-                                </VBox> -->
+                                </VBox>
                                 <VBox id="pricingBox">
                                     <BusyIndicator id="pricingBusy" 
                                         size="1rem" 
