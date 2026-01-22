@@ -273,7 +273,7 @@ export default class View1 extends Controller {
     const match = escapeHtml(mpn.substring(originalStartIndex, originalEndIndex));
     const after = escapeHtml(mpn.substring(originalEndIndex));
 
-    return `${before}<span style="background-color: #ffd9003f; color: #000; font-weight: bold;">${match}</span>${after}`;
+    return `${before}<span style="background-color: #ffd90069; color: #000; font-weight: bold;">${match}</span>${after}`;
   }
 
   public onQuantityChange(oEvent?: Event): void {
