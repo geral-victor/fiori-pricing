@@ -11,7 +11,9 @@ import type {
   GetPricingAndStockBySkuResponse,
   PricingTier,
   PricingSnapshot,
+  SkuInfo,
 } from '@GERAL-STT/component-pricing-api';
+import { ApiFetchMetadata } from '@GERAL-STT/component-pricing-api/dist/lib/base-api-connector';
 
 interface PriceTierWithApplicable extends PricingTier {
   isApplicable: string; // 'true' | 'false'
@@ -21,12 +23,7 @@ type PricingSnapshotWithApplicableTiers = PricingSnapshot & {
   pricing: PriceTierWithApplicable[];
 };
 
-interface ResultItem {
-  supplier: string;
-  sku: string;
-  manufacturer: string;
-  mpn: string;
-  description: string;
+interface ResultItem extends SkuInfo, ApiFetchMetadata {
   pricingLoading: boolean;
   pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;
@@ -112,7 +109,7 @@ export default class View1 extends Controller {
           pricing: null,
           pricingError: null,
           highlight: 'false',
-          inferredMpn: data.inferedMpn || '',
+          inferredMpn: data.inferedMpn,
         }));
         this.componentModel.setProperty('/results', results);
 
