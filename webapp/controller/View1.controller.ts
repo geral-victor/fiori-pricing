@@ -27,6 +27,8 @@ interface ResultItem {
   manufacturer: string;
   mpn: string;
   description: string;
+  url?: string;
+  imageUrl?: string;
   pricingLoading: boolean;
   pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;
@@ -99,7 +101,7 @@ export default class View1 extends Controller {
 
       if (data.warnings && data.warnings.length > 0) {
         MessageBox.warning(
-          `Warnings during search:\n- ${data.warnings.join('\n- ')}`,
+          `Warnings during search:\n- ${data.warnings.map((w) => `${w.apiName}: ${w.message}`).join('\n- ')}`,
         );
       }
 
