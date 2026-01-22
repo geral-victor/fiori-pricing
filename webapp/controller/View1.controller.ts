@@ -31,6 +31,7 @@ interface ResultItem {
   pricing: PricingSnapshotWithApplicableTiers | null;
   pricingError: string | null;
   highlight: string; // 'true' | 'false'
+  inferredMpn: string; // The inferred MPN from user input
 }
 
 interface ComponentData {
@@ -111,6 +112,7 @@ export default class View1 extends Controller {
           pricing: null,
           pricingError: null,
           highlight: 'false',
+          inferredMpn: data.inferedMpn || '',
         }));
         this.componentModel.setProperty('/results', results);
 
@@ -206,6 +208,72 @@ export default class View1 extends Controller {
   public formatPrice(price: number, currency: string): string {
     if (!price || !currency) return '';
     return `@ ${price.toFixed(3).padStart(8, ' ')} ${currency}`;
+  }
+
+  public formatMpnWithHighlight(mpn: string, inferredMpn: string): string {
+    if (!mpn || !inferredMpn || inferredMpn.trim() === '') {
+      return mpn || '';
+    }
+
+    // Escape HTML special characters
+    const escapeHtml = (str: string): string => {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+
+    // Normalize strings by removing special characters for comparison
+    const normalize = (str: string): string => {
+      return str.replace(/[-_.\s]/g, '');
+    };
+
+    const normalizedMpn = normalize(mpn).toLowerCase();
+    const normalizedInferredMpn = normalize(inferredMpn).toLowerCase();
+
+    // Find the position of the inferred MPN in the normalized actual MPN
+    const startIndex = normalizedMpn.indexOf(normalizedInferredMpn);
+    
+    if (startIndex === -1) {
+      // No match found, return the original MPN escaped
+      return escapeHtml(mpn);
+    }
+
+    // Map the position back to the original string
+    let normalizedPos = 0;
+    let originalStartIndex = -1;
+    let originalEndIndex = -1;
+
+    for (let i = 0; i < mpn.length; i++) {
+      const char = mpn[i];
+      if (char === undefined) {
+        throw new Error('Unexpected undefined character in MPN string');
+      }
+      // Check if this character would be in the normalized string
+      if (!/[-_.\s]/.test(char)) {
+        if (normalizedPos === startIndex && originalStartIndex === -1) {
+          originalStartIndex = i;
+        }
+        if (normalizedPos === startIndex + normalizedInferredMpn.length - 1) {
+          originalEndIndex = i + 1;
+          break;
+        }
+        normalizedPos++;
+      }
+    }
+
+    if (originalStartIndex === -1 || originalEndIndex === -1) {
+      return escapeHtml(mpn);
+    }
+
+    // Build the highlighted string
+    const before = escapeHtml(mpn.substring(0, originalStartIndex));
+    const match = escapeHtml(mpn.substring(originalStartIndex, originalEndIndex));
+    const after = escapeHtml(mpn.substring(originalEndIndex));
+
+    return `${before}<span style="background-color: #ffd9003f; color: #000; font-weight: bold;">${match}</span>${after}`;
   }
 
   public onQuantityChange(oEvent?: Event): void {

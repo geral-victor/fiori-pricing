@@ -90,7 +90,13 @@
                                     target="_blank"
                                     enabled="{= !!${componentData>url}}"/>
                                 <Text id="manufacturerText" text="{componentData>manufacturer}"/>
-                                <Text id="mpnText" text="{componentData>mpn}"/>
+                                <FormattedText id="mpnFormattedText" htmlText="{
+                                    parts: [
+                                        {path: 'componentData>mpn'},
+                                        {path: 'componentData>inferredMpn'}
+                                    ],
+                                    formatter: '.formatMpnWithHighlight'
+                                }"/>
                                 <Text id="descriptionText" text="{componentData>description}"/>
                                 <VBox id="stockBox">
                                     <BusyIndicator id="stockBusy" 
