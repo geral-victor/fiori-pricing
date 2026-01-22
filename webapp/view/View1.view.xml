@@ -50,29 +50,32 @@
                         <Column id="skuColumn" width="8em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="skuHeader" text="SKU"/>
                         </Column>
-                        <Column id="manufacturerColumn" width="8em" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="manufacturerColumn" width="7em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="manufacturerHeader" text="Manufacturer"/>
                         </Column>
-                        <Column id="mpnColumn" width="10em" minScreenWidth="Desktop" demandPopin="true">
+                        <Column id="mpnColumn" width="7em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="mpnHeader" text="MPN"/>
                         </Column>
                         <Column id="descriptionColumn" width="10em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="descriptionHeader" text="Description"/>
                         </Column>
-                        <Column id="packagingColumn" width="6em" minScreenWidth="Tablet" demandPopin="true">
+                        <Column id="packagingColumn" width="5em" minScreenWidth="Tablet" demandPopin="true">
                             <Text id="packagingHeader" text="Packaging"/>
                         </Column>
                         <Column id="stockColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="stockHeader" text="Stock"/>
                         </Column>
-                        <Column id="moqColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <Column id="moqColumn" width="4em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="moqHeader" text="MOQ"/>
                         </Column>
-                        <Column id="mpqColumn" width="5em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
+                        <Column id="mpqColumn" width="4em" minScreenWidth="Tablet" demandPopin="true" hAlign="End">
                             <Text id="mpqHeader" text="MPQ"/>
                         </Column>
                         <Column id="pricingColumn" width="12em" minScreenWidth="Desktop" demandPopin="true">
                             <Text id="pricingHeader" text="Pricing Tiers"/>
+                        </Column>
+                        <Column id="unitColumn" width="5em" minScreenWidth="Tablet" demandPopin="true">
+                            <Text id="unitHeader" text="Unit"/>
                         </Column>
                     </columns>
                     <items>
@@ -171,6 +174,14 @@
                                         text="{componentData>pricingError}"
                                         visible="{= !${componentData>pricingLoading} &amp;&amp; !!${componentData>pricingError}}"
                                         class="sapUiTinyMarginTop"/>
+                                </VBox>
+                                <VBox id="unitBox">
+                                    <BusyIndicator id="unitBusy" 
+                                        size="1rem" 
+                                        visible="{componentData>pricingLoading}"/>
+                                    <Text id="unitText" 
+                                        text="{componentData>unitNormalized}"
+                                        visible="{= !${componentData>pricingLoading} &amp;&amp; !${componentData>pricingError}}"/>
                                 </VBox>
                             </cells>
                         </ColumnListItem>
